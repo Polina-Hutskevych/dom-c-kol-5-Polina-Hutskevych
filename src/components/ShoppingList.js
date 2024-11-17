@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import './ShoppingList.css';
 import EditTitle from './EditTitle';
 import InviteModal from './InviteModal';
@@ -8,7 +9,8 @@ import AddItem from './AddItem';
 import FilterItems from './FilterItems';
 
 
-const InitialData = {
+const InitialData = [{
+    id: '1',
     title: 'Grocery Planner',
     owner: 'user',
     currentUser: 'user',
@@ -18,14 +20,40 @@ const InitialData = {
       { id: 2, name: 'Bread', resolved: true },
       { id: 3, name: 'Eggs', resolved: false },
       { id: 4, name: 'Meat', resolved: false },
+    ], 
+  },
+  {
+    id: '2',
+    title: 'Vegetables',
+    owner: 'user',
+    currentUser: 'user',
+    invitedUsers: ['user4', 'user5'],
+    items: [
+      { id: 1, name: 'Carrot', resolved: false },
+      { id: 2, name: 'Potatoes', resolved: true },
+      { id: 3, name: 'Lettuce', resolved: true },
     ],
-  };
+  },
+];
 
 function ShoppingList() {
-
-    const [shoppingList, setShoppingList] = useState(InitialData);
+    const { id } = useParams();
+    const [shoppingList, setShoppingList] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [filter, setFilter] = useState('all');
+
+
+    useEffect(() => {
+      const list = InitialData.find((list) => list.id === id);
+      if (list) {
+        setShoppingList(list); 
+      } else {
+        setShoppingList(null); 
+      }
+    }, [id]); 
+    if (!shoppingList) {
+      return <div>Shopping List Not Found</div>;
+    }
 
     const updateTitle = (newTitle) => {
         setShoppingList({ ...shoppingList, title: newTitle });
