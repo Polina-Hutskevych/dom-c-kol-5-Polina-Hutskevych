@@ -1,5 +1,8 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
 import './ShoppingList.css';
 import EditTitle from './EditTitle';
 import InviteModal from './InviteModal';
@@ -8,8 +11,10 @@ import DisplayItems from './DisplayItems';
 import AddItem from './AddItem';
 import FilterItems from './FilterItems';
 
+const COLORS = ['#0088FE', '#FF8042'];
 
-const InitialData = [{
+const InitialData = [
+  {
     id: '1',
     title: 'Grocery Planner',
     owner: 'user',
@@ -20,7 +25,7 @@ const InitialData = [{
       { id: 2, name: 'Bread', resolved: true },
       { id: 3, name: 'Eggs', resolved: false },
       { id: 4, name: 'Meat', resolved: false },
-    ], 
+    ],
   },
   {
     id: '2',
@@ -37,125 +42,144 @@ const InitialData = [{
 ];
 
 function ShoppingList() {
-    const { id } = useParams();
-    const [shoppingList, setShoppingList] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [filter, setFilter] = useState('all');
+  const { id } = useParams();
+  const [shoppingList, setShoppingList] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filter, setFilter] = useState('all');
 
+  useEffect(() => {
+    const list = InitialData.find((list) => list.id === id);
+    setShoppingList(list || null);
+  }, [id]);
 
-    useEffect(() => {
-      const list = InitialData.find((list) => list.id === id);
-      if (list) {
-        setShoppingList(list); 
-      } else {
-        setShoppingList(null); 
-      }
-    }, [id]); 
-    if (!shoppingList) {
-      return <div>Shopping List Not Found</div>;
-    }
+  if (!shoppingList) {
+    return <div>Shopping List Not Found</div>;
+  }
 
-    const updateTitle = (newTitle) => {
-        setShoppingList({ ...shoppingList, title: newTitle });
-    };
+  const updateTitle = (newTitle) => {
+    setShoppingList({ ...shoppingList, title: newTitle });
+  };
 
-    const canEdit = shoppingList.owner === shoppingList.currentUser;
+  const canEdit = shoppingList.owner === shoppingList.currentUser;
 
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
 
-
-    const handleOpenModal = () => setIsModalOpen(true);
-    const handleCloseModal = () => setIsModalOpen(false);
-
-    const handleRemoveUser = (username) => {
-      setShoppingList((prevList) => ({
-          ...prevList,
-          invitedUsers: prevList.invitedUsers.filter((user) => user !== username)
-      }));
+  const handleRemoveUser = (username) => {
+    setShoppingList((prevList) => ({
+      ...prevList,
+      invitedUsers: prevList.invitedUsers.filter((user) => user !== username),
+    }));
   };
 
   const handleLogout = () => {
     setShoppingList((prevList) => ({
-        ...prevList,
-        invitedUsers: prevList.invitedUsers.filter((user) => user !== shoppingList.currentUser),
+      ...prevList,
+      invitedUsers: prevList.invitedUsers.filter((user) => user !== shoppingList.currentUser),
     }));
-};
+  };
 
-
-const handleToggleItem = (id) => {
-  setShoppingList((prevList) => ({
+  const handleToggleItem = (id) => {
+    setShoppingList((prevList) => ({
       ...prevList,
       items: prevList.items.map((item) =>
-          item.id === id ? { ...item, resolved: !item.resolved } : item
+        item.id === id ? { ...item, resolved: !item.resolved } : item
       ),
-  }));
-};
+    }));
+  };
 
-const handleDeleteItem = (id) => {
-  setShoppingList((prevList) => ({
+  const handleDeleteItem = (id) => {
+    setShoppingList((prevList) => ({
       ...prevList,
       items: prevList.items.filter((item) => item.id !== id),
-  }));
-};
+    }));
+  };
 
-
-const handleAddItem = (itemName) => {
-  const newItem = {
+  const handleAddItem = (itemName) => {
+    const newItem = {
       id: shoppingList.items.length + 1,
       name: itemName,
       resolved: false,
-  };
-  setShoppingList((prevList) => ({
+    };
+    setShoppingList((prevList) => ({
       ...prevList,
       items: [...prevList.items, newItem],
-  }));
-};
+    }));
+  };
 
+  const applyFilter = (items) => {
+    if (filter === 'notCompleted') {
+      return items.filter((item) => !item.resolved);
+    } else if (filter === 'completed') {
+      return items.filter((item) => item.resolved);
+    }
+    return items;
+  };
 
-const applyFilter = (items) => {
-  if (filter === 'notCompleted') {
-      return items.filter(item => !item.resolved);
-  } else if (filter === 'completed') {
-      return items.filter(item => item.resolved);
-  }
-  return items;
-};
+  const filteredItems = applyFilter(shoppingList.items);
 
-const filteredItems = applyFilter(shoppingList.items);
-
+  // Data for Pie Chart
+  const resolvedCount = shoppingList.items.filter((item) => item.resolved).length;
+  const unresolvedCount = shoppingList.items.length - resolvedCount;
+  const pieData = [
+    { name: 'Resolved', value: resolvedCount },
+    { name: 'Unresolved', value: unresolvedCount },
+  ];
 
   return (
     <section className="shopping-list-section">
-       <EditTitle
-                title={shoppingList.title}
-                onTitleChange={updateTitle}
-                canEdit={canEdit}
-            />
+      <EditTitle
+        title={shoppingList.title}
+        onTitleChange={updateTitle}
+        canEdit={canEdit}
+      />
 
-{shoppingList.owner === shoppingList.currentUser ? (
-                <button onClick={handleOpenModal} className="invite-button">Invite</button>
-              ) : (
-                <button onClick={handleLogout} className="logout-button">Log Out</button>
-            )}
-            {isModalOpen && <InviteModal onClose={handleCloseModal} />}
-            <AddItem onAdd={handleAddItem} />
-            <FilterItems filter={filter} setFilter={setFilter} />
-            <InvitedUsers 
-                invitedUsers={shoppingList.invitedUsers} 
-                isOwner={shoppingList.owner === shoppingList.currentUser} 
-                onRemoveUser={handleRemoveUser} 
-                />
+      {shoppingList.owner === shoppingList.currentUser ? (
+        <button onClick={handleOpenModal} className="invite-button">Invite</button>
+      ) : (
+        <button onClick={handleLogout} className="logout-button">Log Out</button>
+      )}
+      {isModalOpen && <InviteModal onClose={handleCloseModal} />}
+      <AddItem onAdd={handleAddItem} />
+      <FilterItems filter={filter} setFilter={setFilter} />
+      <InvitedUsers
+        invitedUsers={shoppingList.invitedUsers}
+        isOwner={shoppingList.owner === shoppingList.currentUser}
+        onRemoveUser={handleRemoveUser}
+      />
 
-                <div className="owner-display">
-                <span>Owner: {shoppingList.owner}</span>
-                </div>
+      <div className="owner-display">
+        <span>Owner: {shoppingList.owner}</span>
+      </div>
 
-                 <DisplayItems items={filteredItems}
-          
-                 onToggleItem={handleToggleItem}
-                 onDeleteItem={handleDeleteItem} 
-                 />
-                 <div className="vertical-line"></div> 
+      <DisplayItems
+        items={filteredItems}
+        onToggleItem={handleToggleItem}
+        onDeleteItem={handleDeleteItem}
+      />
 
+      <div className="vertical-line"></div>
+
+      <div className="pie-chart-container">
+        <h3>Item Status</h3>
+        <PieChart width={400} height={300}>
+          <Pie
+            data={pieData}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={100}
+            label
+          >
+            {pieData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+        </PieChart>
+      </div>
     </section>
   );
 }

@@ -60,3 +60,9 @@
     }
 }
 
+
+.bar-chart-container {
+    position: relative;
+    left: 1200px;
+    top: 250px;
+}

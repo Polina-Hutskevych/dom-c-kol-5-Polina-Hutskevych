@@ -1,13 +1,13 @@
 .shopping-list-section {
     position: relative;
     top: 30px;
-    background-color: #e6f6fc; /* Light grey background */
-    padding: 300px;            /* Space inside the block */
-    border-radius: 10px;      /* Rounded corners */
-    width: 900px;             /* Width of the block */
+    background-color: #e6f6fc; 
+    padding: 300px;            
+    border-radius: 10px;      
+    width: 900px;             
     height: 300px;
-    margin: 0 auto;           /* Center the block horizontally */
-    text-align: center;       /* Center the text inside */
+    margin: 0 auto;           
+    text-align: center;       
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
   }
   
@@ -67,3 +67,16 @@
   font-size: 1em;
   font-weight: bold;
 }
+
+.pie-chart-container {
+  display: flex;                        
+  justify-content: center;              
+  align-items: flex-start;            
+  position: absolute;                   
+  top: 195px;                           
+  right: 20px;                          
+  width: auto;                        
+  height: auto;                         
+}
+
+
