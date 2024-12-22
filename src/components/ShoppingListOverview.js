@@ -27,7 +27,7 @@ const InitialData = [
   },
 ];
 
-function ShoppingListOverview() {
+function ShoppingListOverview({ translations }) {  // Destructure translations from props
   const [shoppingLists, setShoppingLists] = useState(InitialData);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isAddModalOpen, setAddModalOpen] = useState(false);
@@ -74,22 +74,22 @@ function ShoppingListOverview() {
 
   return (
     <div className="shopping-lists-overview">
-      <h1 className="shopping-list-title">My Shopping Lists</h1>
+      <h1 className="shopping-list-title">{translations.myShoppingLists}</h1>
       <button className="add-list-button" onClick={openAddModal}>
-        Add Shopping List
+        {translations.addShoppingList}
       </button>
 
       <div className="bar-chart-container">
-  <h3>Shopping List Item Counts</h3>
-  <BarChart width={300} height={200} data={itemCounts}>
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis dataKey="name" />
-    <YAxis />
-    <Tooltip />
-    <Legend />
-    <Bar dataKey="itemCount" fill="#8884d8" />
-  </BarChart>
-</div>
+        <h3>{translations.shoppingListItemCounts}</h3>
+        <BarChart width={300} height={200} data={itemCounts}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="itemCount" fill="#8884d8" />
+        </BarChart>
+      </div>
 
       <div className="shopping-list-container">
         {shoppingLists.map((list) => (
@@ -101,7 +101,7 @@ function ShoppingListOverview() {
               onClick={() => openDeleteModal(list)}
               className="delete-button"
             >
-              Delete
+              {translations.delete}
             </button>
           </div>
         ))}

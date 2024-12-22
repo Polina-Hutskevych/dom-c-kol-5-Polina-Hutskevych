@@ -1,3 +1,21 @@
 body {
     background-color: rgb(255, 251, 238);
 }
+
+
+  
+  body.dark-mode {
+    background-color: #6f7996;
+    color: #f7f7f7;
+  }
+
+  button {
+    background-color: #827dc9;
+    color: #ffffff;
+    border: none;
+    padding: 12px 18px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }

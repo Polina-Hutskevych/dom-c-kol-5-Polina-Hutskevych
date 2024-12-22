@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
@@ -41,7 +39,7 @@ const InitialData = [
   },
 ];
 
-function ShoppingList() {
+function ShoppingList({ translations }) {  
   const { id } = useParams();
   const [shoppingList, setShoppingList] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,7 +51,7 @@ function ShoppingList() {
   }, [id]);
 
   if (!shoppingList) {
-    return <div>Shopping List Not Found</div>;
+    return <div>{translations.shoppingListNotFound}</div>;
   }
 
   const updateTitle = (newTitle) => {
@@ -122,8 +120,8 @@ function ShoppingList() {
   const resolvedCount = shoppingList.items.filter((item) => item.resolved).length;
   const unresolvedCount = shoppingList.items.length - resolvedCount;
   const pieData = [
-    { name: 'Resolved', value: resolvedCount },
-    { name: 'Unresolved', value: unresolvedCount },
+    { name: translations.resolved, value: resolvedCount },
+    { name: translations.unresolved, value: unresolvedCount },
   ];
 
   return (
@@ -135,13 +133,17 @@ function ShoppingList() {
       />
 
       {shoppingList.owner === shoppingList.currentUser ? (
-        <button onClick={handleOpenModal} className="invite-button">Invite</button>
+        <button onClick={handleOpenModal} className="invite-button">
+          {translations.invite}
+        </button>
       ) : (
-        <button onClick={handleLogout} className="logout-button">Log Out</button>
+        <button onClick={handleLogout} className="logout-button">
+          {translations.logout}
+        </button>
       )}
       {isModalOpen && <InviteModal onClose={handleCloseModal} />}
       <AddItem onAdd={handleAddItem} />
-      <FilterItems filter={filter} setFilter={setFilter} />
+      <FilterItems filter={filter} setFilter={setFilter} translations={translations}/>
       <InvitedUsers
         invitedUsers={shoppingList.invitedUsers}
         isOwner={shoppingList.owner === shoppingList.currentUser}
@@ -149,7 +151,7 @@ function ShoppingList() {
       />
 
       <div className="owner-display">
-        <span>Owner: {shoppingList.owner}</span>
+        <span>{translations.owner}: {shoppingList.owner}</span>
       </div>
 
       <DisplayItems
@@ -161,7 +163,7 @@ function ShoppingList() {
       <div className="vertical-line"></div>
 
       <div className="pie-chart-container">
-        <h3>Item Status</h3>
+        <h3>{translations.itemStatus}</h3>
         <PieChart width={400} height={300}>
           <Pie
             data={pieData}
